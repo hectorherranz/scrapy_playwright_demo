@@ -1,0 +1,69 @@
+# pyproject.toml — canonical, package-installable, with tooling config
+# Runtime dependencies are still managed in requirements.txt (simpler with Docker),
+# so we don’t duplicate them here.
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "scrapy-playwright-demo"
+version = "0.1.0"
+description = "Scrapy + Playwright demo with per-page persistence and resumable jobs"
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [{ name = "Your Name", email = "you@example.com" }]
+license = { text = "MIT" }
+
+[tool.setuptools.packages.find]
+include = ["scrapy_playwright_demo*"]
+
+# --------------------
+# Formatting / Linting
+# --------------------
+[tool.black]
+line-length = 88
+target-version = ["py312"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [
+  "E", "F", "W", "I",
+  "UP", "B", "C90", "N", "D", "ANN",
+  "S", "A", "C4", "DTZ", "EM", "EXE", "ISC", "ICN",
+  "INP", "PIE", "T20", "Q", "RET", "SIM", "TID",
+  "ARG", "PTH", "ERA", "PL", "RUF"
+]
+ignore = []
+
+per-file-ignores = { "tests/**" = ["S101", "D"] }
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+# -------
+# MyPy
+# -------
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = true
+strict = true
+show_error_codes = true
+pretty = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_unreachable = true
+# If you adopt pydantic v2 models:
+# plugins = ["pydantic.mypy"]
+
+# -------
+# Pytest
+# -------
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = ["tests"]

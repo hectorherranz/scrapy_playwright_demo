@@ -1,0 +1,50 @@
+services:
+  scrapyd:
+    build:
+      context: .
+      target: runtime
+    container_name: scrapyd
+    command: scrapyd
+    ports:
+      - "6800:6800"
+    ipc: host            # recomendado por Playwright
+    volumes:
+      - ./data:/data     # resultados (PAGE_OUT_DIR) + estado (JOBDIR)
+    environment:
+      - PYTHONUNBUFFERED=1
+      # Opcional: defaults para que el spider los herede si no los sobreescribes
+      - PAGE_OUT_DIR=/data/products
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- 127.0.0.1:6800/daemonstatus.json >/dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  runner:
+    build:
+      context: .
+      target: runtime
+    profiles: ["dev"]    # se ejecuta solo si lo llamas explícitamente
+    ipc: host
+    volumes:
+      - ./data:/data
+    entrypoint: ["scrapy"]
+    command:
+      [
+        "crawl", "zalando",
+        "-s", "JOBDIR=/data/state/zalando",
+        "-s", "PAGE_OUT_DIR=/data/products",
+        "-s", "LOG_LEVEL=INFO"
+      ]
+
+  tester:
+    build:
+      context: .
+      target: tester
+    profiles: ["dev", "test"]
+    volumes:
+      - .:/app           # hot‑reload de código/tests
+    command: ["pytest", "-q"]
+    # Alternativas:
+    # command: ["pytest", "--cov=scrapy_playwright_demo", "--cov-report=term-missing"]
+    # command: ["ruff", "check", ".", "&&", "mypy", "scrapy_playwright_demo"]

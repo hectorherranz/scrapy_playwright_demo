@@ -1,0 +1,22 @@
+scrapy>=2.11,<3
+scrapy-playwright>=0.0.30
+scrapyd>=1.4.3
+
+pydantic>=2.5,<3
+pydantic-settings>=2.2,<3
+
+# métricas
+scrapy-prometheus==0.4.4     # <-- bajar versión
+prometheus-client>=0.20
+
+structlog>=24.1
+sentry-sdk>=2.0
+
+smart_open>=6.4
+boto3>=1.34
+
+# Kafka: elige uno; si te quedas con aiokafka, elimina kafka-python
+aiokafka>=0.10
+# kafka-python>=2.0
+
+scrapyd-client>=1.4

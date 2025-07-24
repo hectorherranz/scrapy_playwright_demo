@@ -1,0 +1,62 @@
+# Byte-compiled / cache / logs
+__pycache__/
+*.py[cod]
+*.pyo
+*.log
+
+# Virtual environments
+.venv/
+env/
+venv/
+ENV/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Scrapy output and state
+*.jl
+*.jl.gz
+*.json
+*.csv
+*.xml
+*.db
+/data/
+out/
+state/
+scrapy_playwright_demo/out/
+scrapy_playwright_demo/data/
+scrapy_playwright_demo/state/
+
+# Scrapyd logs and eggs
+logs/
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Test and coverage
+.coverage
+.cache/
+htmlcov/
+.tox/
+.pytest_cache/
+nosetests.xml
+coverage.xml
+
+# IDE/editor/project files
+.vscode/
+.idea/
+*.iml
+*.sublime-project
+*.sublime-workspace
+
+# Docker
+*.pid
+*.sock
+docker-compose.override.yml
+
+# Mac/Windows/Linux system files
+.DS_Store
+Thumbs.db 
