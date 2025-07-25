@@ -121,3 +121,31 @@ flowchart TD;
 ## Notas
 - The spider waits for products to load using Playwright.
 - You can extend the spider for pagination, more fields, etc. 
+
+## Dependency Injection Container
+
+This project uses a minimal DI container to manage core dependencies (retry policy, page sink, logger, etc.) for pipelines, middlewares, and spiders.
+
+- The container is instantiated in `settings.py` and injected as `settings["CONTAINER"]`.
+- Access it in your pipeline/middleware via `container = crawler.settings["CONTAINER"]`.
+- Obtain dependencies via methods like `container.retry_policy()`, `container.page_sink()`, `container.logger(spider)`.
+- All dependencies are singletons per process unless otherwise noted.
+
+### Example (in a pipeline):
+```python
+@classmethod
+def from_crawler(cls, crawler):
+    container = crawler.settings["CONTAINER"]
+    sink = container.page_sink()
+    return cls(sink=sink)
+```
+
+### Testing with Fakes
+You can inject a `FakeSink` or other test double by monkeypatching the container in your test:
+```python
+from scrapy_playwright_demo.sinks.fake import FakeSink
+container = Container(app_settings)
+monkeypatch.setattr(container, "page_sink", lambda: FakeSink())
+```
+
+See `tests/test_container.py` and `tests/test_pipelines.py` for examples. 

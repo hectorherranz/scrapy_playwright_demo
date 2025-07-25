@@ -2,6 +2,14 @@
 
 from scrapy_playwright_demo.config import app_settings  # noqa: F401  (must be imported before Scrapy reads settings)
 import scrapy_playwright_demo.bootstrap  # noqa: F401
+from scrapy_playwright_demo.container import Container
+
+# Global DI container (singleton per process)
+CONTAINER = Container(app_settings)
+
+# Make it available in Scrapy settings
+# (Scrapy reads this file as a module, so globals() is the settings dict)
+globals()["CONTAINER"] = CONTAINER
 
 # -----------------
 # Core settings

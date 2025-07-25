@@ -8,6 +8,15 @@ from scrapy.exceptions import DropItem
 from scrapy_playwright_demo.items import ProductItem, Currency
 from scrapy_playwright_demo.pipelines import ValidateProductPipeline, PerPageSinkPipeline
 from scrapy_playwright_demo.sinks.file import FileSink
+from scrapy_playwright_demo.sinks.fake import FakeSink
+from scrapy_playwright_demo.container import Container
+from scrapy_playwright_demo.config import AppSettings
+
+
+class DummyCrawler:
+    def __init__(self, settings):
+        self.settings = settings
+        self.signals = type("Signals", (), {"connect": lambda *a, **k: None})()
 
 
 def make_settings(out_dir: str, compress: bool = True, idempotent: bool = True):
@@ -97,3 +106,14 @@ def test_perpage_filesink_flush_on_close(tmp_path, valid_item: ProductItem):
     done_path = out_dir / f"page-{page}.done"
     assert data_path.exists()
     assert done_path.exists()
+
+
+def test_per_page_sink_pipeline_uses_container(monkeypatch):
+    fake_sink = FakeSink()
+    app_settings = AppSettings()
+    container = Container(app_settings)
+    monkeypatch.setattr(container, "page_sink", lambda: fake_sink)
+    settings = {"CONTAINER": container, "PAGE_DROP_MISSING_FIELD": True}
+    crawler = DummyCrawler(settings)
+    pipe = PerPageSinkPipeline.from_crawler(crawler)
+    assert pipe.sink is fake_sink

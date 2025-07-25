@@ -11,18 +11,24 @@ from .base import PageSink
 # from .kafka import KafkaSink
 # from .s3 import S3Sink
 
+from collections.abc import Mapping
 
-def _get(settings: Mapping[str, Any] | Settings, key: str, default=None):
+def _get(settings, key: str, default=None):
+    # 1) Scrapy Settings or dict-like
     if hasattr(settings, "get"):
         try:
             return settings.get(key, default)
-        except TypeError:
-            v = settings.get(key)
-            return default if v is None else v
-    return settings.get(key, default)  # type: ignore[arg-type]
+        except Exception:
+            pass
+    if isinstance(settings, Mapping):
+        return settings.get(key, default)
+    # 2) Pydantic settings object (AppSettings)
+    # Keys come in UPPER_SNAKE_CASE -> turn into lower_snake_case attr
+    attr = key.lower()
+    return getattr(settings, attr, default)
 
 
-def build_sink(settings: Mapping[str, Any] | Settings) -> PageSink:
+def build_sink(settings) -> PageSink:
     sink_name = str(_get(settings, "PAGE_SINK", "file")).lower()
 
     if sink_name == "file":

@@ -10,7 +10,10 @@ class CustomRetryMiddleware:
 
     @classmethod
     def from_crawler(cls, crawler):
-        policy = build_retry_policy(crawler.settings)
+        container = crawler.settings.get("CONTAINER")
+        if container is None:
+            raise RuntimeError("DI Container not found in settings. Make sure settings.CONTAINER is set.")
+        policy = container.retry_policy()
         return cls(policy)
 
     def process_response(self, request, response, spider):

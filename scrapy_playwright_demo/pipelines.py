@@ -29,6 +29,17 @@ def _to_jsonable_dict(item: Any) -> Dict[str, Any]:
     return dict(ItemAdapter(item).asdict())
 
 
+def _get_bool(settings, key, default):
+    try:
+        return settings.getbool(key, default)  # Scrapy Settings
+    except AttributeError:
+        if hasattr(settings, "get"):
+            return bool(settings.get(key, default))
+        # Pydantic model
+        attr = key.lower()
+        return bool(getattr(settings, attr, default))
+
+
 # --------------------------------------------------------------------------- #
 # 1) Validation pipeline
 # --------------------------------------------------------------------------- #
@@ -86,10 +97,14 @@ class PerPageSinkPipeline:
 
     @classmethod
     def from_crawler(cls, crawler):
-        sink = build_sink(crawler.settings.get("PAGE_SINK", "file"), crawler.settings)
+        container = crawler.settings.get("CONTAINER")
+        if container is None:
+            raise RuntimeError("DI Container not found in settings. Make sure settings.CONTAINER is set.")
+        sink = container.page_sink()
+        drop_missing_page = _get_bool(crawler.settings, "PAGE_DROP_MISSING_FIELD", True)
         pipe = cls(
             sink=sink,
-            drop_missing_page=crawler.settings.getbool("PAGE_DROP_MISSING_FIELD", True),
+            drop_missing_page=drop_missing_page,
         )
         pipe._settings = crawler.settings
         crawler.signals.connect(pipe.spider_opened, signals.spider_opened)
