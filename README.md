@@ -105,7 +105,7 @@ scrapy crawl zalando -s LOG_LEVEL=INFO
 docker compose run --rm tester
 
 # Regular run
-docker compose run --rm app scrapy crawl zalando
+docker compose run --rm runner scrapy crawl zalando
 ```
 
 ---

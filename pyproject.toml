@@ -12,7 +12,7 @@ version = "0.1.0"
 description = "Scrapy + Playwright demo with per-page persistence and resumable jobs"
 readme = "README.md"
 requires-python = ">=3.12"
-authors = [{ name = "Your Name", email = "you@example.com" }]
+authors = [{ name = "Hector Herranz", email = "hectorherranz91@gmail.com" }]
 license = { text = "MIT" }
 
 [tool.setuptools.packages.find]
